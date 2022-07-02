@@ -30,13 +30,18 @@ class ForumEXBO:
 		"remember": remember
 		}
 		response = requests.post(
-			f"{self.api}/login", json=data, headers=self.headers).json()
+			f"{self.api}/login", json=data, headers=self.headers)
+		json = response.json()
 		try:
-			self.token = response["token"]
-			self.user_id = response["userId"]
+			self.flarum_session = response.cookies["flarum_session"]
+			self.x_csrf_token = response.headers["X-CSRF-Token"]
+			self.headers["cookie"] = f"flarum_session={self.flarum_session}"
+			self.headers["x-csrf-token"] = self.x_csrf_token
+			self.token = json["token"]
+			self.user_id = json["userId"]
 		except Exception as e:
 			print(e)
-		return response
+		return json
 
 	def like_comment(self, comment_id: int):
 		data = {
