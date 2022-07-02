@@ -14,11 +14,11 @@ class ForumEXBO:
 		
 	def get_cookies(self):
 		response =  requests.get(self.api, headers=self.headers)
+		self.csrf_token = response.headers["X-CSRF-Token"]
 		self.flarum_session = response.cookies["flarum_session"]
-		self.x_csrf_token = response.headers["X-CSRF-Token"]
+		self.headers["x-csrf-token"] = self.csrf_token
 		self.headers["cookie"] = f"flarum_session={self.flarum_session}"
-		self.headers["x-csrf-token"] = self.x_csrf_token
-
+		
 	def login(
 			self,
 			identification: str,
@@ -32,13 +32,16 @@ class ForumEXBO:
 		response = requests.post(
 			f"{self.api}/login", json=data, headers=self.headers)
 		json = response.json()
-		try:
-			self.flarum_remember = response.cookies["flarum_remember"]
-			self.headers["cookie"] = f"flarum_remember={self.flarum_remember}"
+		cookies = response.cookies
+		headers = response.headers
+		if "token" in json:
 			self.token = json["token"]
 			self.user_id = json["userId"]
-		except Exception as e:
-			print(e)
+			self.csrf_token = headers["X-CSRF-Token"]
+			self.flarum_session = cookies["flarum_session"]
+			self.flarum_remember = cookies["flarum_remember"]
+			self.headers["x-csrf-token"] = self.csrf_token
+			self.headers["cookie"] = f"flarum_remember={self.flarum_remember}; flarum_session={self.flarum_session}"
 		return json
 
 	def like_comment(self, comment_id: int):
