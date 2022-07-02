@@ -6,4 +6,4 @@ Web-API for [forum.exbo.ru](https://forum.exbo.ru) website which is the official
 import forum_exbo
 forum_exbo = forum_exbo.ForumEXBO()
 forum_exbo.login(identification="", password="")
-``|
+```
