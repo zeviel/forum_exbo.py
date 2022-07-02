@@ -33,10 +33,8 @@ class ForumEXBO:
 			f"{self.api}/login", json=data, headers=self.headers)
 		json = response.json()
 		try:
-			self.flarum_session = response.cookies["flarum_session"]
-			self.x_csrf_token = response.headers["X-CSRF-Token"]
-			self.headers["cookie"] = f"flarum_session={self.flarum_session}"
-			self.headers["x-csrf-token"] = self.x_csrf_token
+			self.flarum_remember = response.cookies["flarum_remember"]
+			self.headers["cookie"] = f"flarum_remember={self.flarum_remember}"
 			self.token = json["token"]
 			self.user_id = json["userId"]
 		except Exception as e:
