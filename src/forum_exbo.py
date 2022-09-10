@@ -5,8 +5,8 @@ class ForumEXBO:
 	def __init__(self):
 		self.api = "https://forum.exbo.ru"
 		self.headers = {
-		"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
-		"Content-Type": "application/json; charset=UTF-8"
+			"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
+			"content-type": "application/json"
 		}
 		self.token = None
 		self.user_id = None
@@ -18,31 +18,15 @@ class ForumEXBO:
 		self.flarum_session = response.cookies["flarum_session"]
 		self.headers["x-csrf-token"] = self.csrf_token
 		self.headers["cookie"] = f"flarum_session={self.flarum_session}"
-		
-	def login(
+	
+	def login_with_flarum(
 			self,
-			identification: str,
-			password: str,
-			remember: bool = True):
-		data = {
-		"identification": identification,
-		"password": password,
-		"remember": remember
-		}
-		response = requests.post(
-			f"{self.api}/login", json=data, headers=self.headers)
-		json = response.json()
-		cookies = response.cookies
-		headers = response.headers
-		if "token" in json:
-			self.token = json["token"]
-			self.user_id = json["userId"]
-			self.csrf_token = headers["X-CSRF-Token"]
-			self.flarum_session = cookies["flarum_session"]
-			self.flarum_remember = cookies["flarum_remember"]
-			self.headers["x-csrf-token"] = self.csrf_token
-			self.headers["cookie"] = f"flarum_remember={self.flarum_remember}; flarum_session={self.flarum_session}"
-		return json
+			flarum_session: str,
+			flarum_remember: str):
+		self.flarum_session = flarum_session
+		self.flarum_remember = self.flarum_remember
+		self.headers["cookie"] = f"flarum_remember={self.flarum_remember}; flarum_session={self.flarum_session}"
+		return self.flarum_session, self.flarum_remember
 
 	def like_comment(self, comment_id: int):
 		data = {
@@ -288,7 +272,7 @@ class ForumEXBO:
 
 	def reset_password(self, email: str):
 		data = {
-		"email": email
+			"email": email
 		}
 		return requests.post(
 			f"{self.api}/forgot",
