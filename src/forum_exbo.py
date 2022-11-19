@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 
 class ForumEXBO:
-	def __init__(self):
+	def __init__(self) -> None:
 		self.api = "https://forum.exbo.ru"
 		self.headers = {
 			"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.99 Safari/537.36",
@@ -12,7 +12,7 @@ class ForumEXBO:
 		self.user_id = None
 		self.get_cookies()
 		
-	def get_cookies(self):
+	def get_cookies(self) -> None:
 		response =  requests.get(self.api, headers=self.headers)
 		self.csrf_token = response.headers["X-CSRF-Token"]
 		self.flarum_session = response.cookies["flarum_session"]
@@ -22,13 +22,13 @@ class ForumEXBO:
 	def login_with_flarum(
 			self,
 			flarum_session: str,
-			flarum_remember: str):
+			flarum_remember: str) -> str:
 		self.flarum_session = flarum_session
 		self.flarum_remember = self.flarum_remember
 		self.headers["cookie"] = f"flarum_remember={self.flarum_remember}; flarum_session={self.flarum_session}"
 		return self.flarum_session, self.flarum_remember
 
-	def like_comment(self, comment_id: int):
+	def like_comment(self, comment_id: int) -> dict:
 		data = {
 		"data": {
 			"type": "posts",
@@ -43,7 +43,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def unlike_comment(self, comment_id: int):
+	def unlike_comment(self, comment_id: int) -> dict:
 		data = {
 			"data": {
 				"type": "posts",
@@ -58,7 +58,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def react_comment(self, comment_id: int, reaction_id: int = 5):
+	def react_comment(self, comment_id: int, reaction_id: int = 5) -> dict:
 		data = {
 			"data": {
 				"type": "posts",
@@ -73,7 +73,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def comment(self, discussion_id: int, content: str):
+	def comment(self, discussion_id: int, content: str) -> dict:
 		data = {
 			"data": {
 				"type": "posts",
@@ -97,7 +97,7 @@ class ForumEXBO:
 			self,
 			comment_id: int,
 			content: str = None,
-			is_hidden: bool = False):
+			is_hidden: bool = False) -> dict:
 		data = {
 			"data": {
 				"type": "posts",
@@ -117,7 +117,7 @@ class ForumEXBO:
 			self,
 			comment_id: int,
 			reason: str,
-			detail: str = None):
+			detail: str = None) -> dict:
 		data = {
 			"data": {
 				"type": "flags",
@@ -147,7 +147,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def follow_discussion(self, discussion_id: int):
+	def follow_discussion(self, discussion_id: int) -> dict:
 		data = {
 			"data": {
 				"type": "discussions",
@@ -162,7 +162,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def unfollow_discussion(self, discussion_id: int):
+	def unfollow_discussion(self, discussion_id: int) -> dict:
 		data = {
 			"data": {
 				"type": "discussions",
@@ -182,7 +182,7 @@ class ForumEXBO:
 			username: str,
 			include: str = "user,lastPostedUser,mostRelevantPost,mostRelevantPost.user,tags,tags.parent,firstPost,lastPost", 
 			sort: str = "-createdAt", 
-			offset: int = 0):
+			offset: int = 0) -> dict:
 		return requests.get(
 			f"{self.api}/api/discussions?include={include}&filter[q]=author:{username}&sort={sort}&page[offset]={offset}",
 			headers=self.headers).json()
@@ -192,7 +192,7 @@ class ForumEXBO:
 			user_id: int,
 			offset: int = 0,
 			limit: int = 20,
-			sort: str = "-createdAt"):
+			sort: str = "-createdAt") -> dict:
 		return requests.get(
 			f"{self.api}/api/posts?filter[type]=comment&filter[mentioned]={user_id}&page[offset]={offset}&page[limit]={limit}&sort={sort}",
 			headers=self.headers).json()
@@ -202,29 +202,31 @@ class ForumEXBO:
 			username: str,
 			offset: int = 0,
 			limit: int = 20,
-			sort: str = "-createdAt"):
+			sort: str = "-createdAt") -> dict:
 		return requests.get(
 			f"{self.api}/api/posts?filter[author]={username}&filter[type]=comment&page[offset]={offset}&page[limit]={limit}&sort={sort}",
 			headers=self.headers).json()
 
-	def get_user_info(self, user_id: int):
+	def get_user_info(self, user_id: int) -> dict:
 		return requests.get(
-			f"{self.api}/api/users/{user_id}", headers=self.headers).json()
+			f"{self.api}/api/users/{user_id}",
+			headers=self.headers).json()
 
-	def get_notifications(self, offset: int = 0):
+	def get_notifications(self, offset: int = 0) -> dict:
 		return requests.get(
-			f"{self.api}/api/notifications?page[offset]={offset}", headers=self.headers).json()
+			f"{self.api}/api/notifications?page[offset]={offset}",
+			headers=self.headers).json()
 
 	def get_discussions(
 			self,
 			include: str = "user,lastPostedUser,tags,tags.parent,firstPost,firstPost,lastPost",
 			sort: str = "-createdAt",
-			offset: int = 20):
+			offset: int = 20) -> dict:
 		return requests.get(
 			f"{self.api}/api/discussions?include={include}&sort={sort}&page[offset]={offset}",
 			headers=self.headers).json()
 
-	def mark_discussions_read(self):
+	def mark_discussions_read(self) -> dict:
 		data = {
 			"data": {
 				"type": "users",
@@ -239,7 +241,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def ignore_user(self, user_id: int):
+	def ignore_user(self, user_id: int) -> dict:
 		data = {
 			"data": {
 				"type": "users",
@@ -255,7 +257,7 @@ class ForumEXBO:
 			headers=self.headers).json()
 
 
-	def unignore_user(self, user_id: int):
+	def unignore_user(self, user_id: int) -> dict:
 		data = {
 			"data": {
 				"type": "users",
@@ -270,7 +272,7 @@ class ForumEXBO:
 			json=data,
 			headers=self.headers).json()
 
-	def reset_password(self, email: str):
+	def reset_password(self, email: str) -> dict:
 		data = {
 			"email": email
 		}
